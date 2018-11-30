@@ -66,6 +66,6 @@ class CreateDataset:
     def crop_face(self, img, path):
         haar = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        face = haar.detectMultiScale(img_gray, 1.1)
+        face = haar.detectMultiScale(img_gray, 1.2)
         for (x, y, w, h) in face:
-            cv2.imwrite(path, img[y:y + w + 10, x:(x + h - 10)])
+            cv2.imwrite(path, img[y:(y + w + 10), x:(x + h - 10)])
