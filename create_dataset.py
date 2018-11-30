@@ -44,6 +44,8 @@ class CreateDataset:
             files = [f for f in listdir(path) if isfile(join(path, f))]
             for bond in files:
                 tmp = cv2.imread(path + "/" + bond)
+                tmp_path = path + "/" + bond
+                self.crop_face(tmp, tmp_path)
                 initials = bond.split("_")[0]
                 self.train_dataset.append((tmp, self.initials2name[str(initials)]))
         except Exception as e:
@@ -53,12 +55,17 @@ class CreateDataset:
         self.read_test_data()
         self.read_training_data()
 
-    def crop_face(self):
+    # def crop_face(self, img):
+    #     haar = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+    #     for bond in self.train_dataset:
+    #         img_gray = cv2.cvtColor(bond[0][:], cv2.COLOR_BGR2GRAY)
+    #         face = haar.detectMultiScale(img_gray, 1.1)
+    #         for (x, y, w, h) in face:
+    #             cv2.imwrite("test.jpg", bond[0][y:y + w + 10, x:(x + h - 10)])
+
+    def crop_face(self, img, path):
         haar = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
-        for bond in self.train_dataset:
-            #print bond[0][:]
-            img_gray = cv2.cvtColor(bond[0][:], cv2.COLOR_BGR2GRAY)
-            face = haar.detectMultiScale(img_gray, 1.1)
-            for (x, y, w, h) in face:
-                #cv2.rectangle(bond[0][:], (x, y), (x + h - 10, y + w + 10), (0, 255, 0), 2)
-                cv2.imwrite("test.jpg", bond[0][y:y + w + 10, x:(x + h - 10)])
+        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        face = haar.detectMultiScale(img_gray, 1.1)
+        for (x, y, w, h) in face:
+            cv2.imwrite(path, img[y:y + w + 10, x:(x + h - 10)])
