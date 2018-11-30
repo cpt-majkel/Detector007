@@ -12,9 +12,10 @@ def main():
     dataset.read_data()
     # print(f'Test data: {dataset.test_data}')
     # print(f'Test data: {dataset.train_dataset}')
-    cv2.imshow(dataset.test_data[0][1], dataset.test_data[0][0])
+    dataset.crop_face()
+    cv2.imshow(dataset.train_dataset[5][1], dataset.train_dataset[5][0])
     cv2.waitKey(0)
-
+    cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     main()

@@ -52,3 +52,13 @@ class CreateDataset:
     def read_data(self):
         self.read_test_data()
         self.read_training_data()
+
+    def crop_face(self):
+        haar = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+        for bond in self.train_dataset:
+            #print bond[0][:]
+            img_gray = cv2.cvtColor(bond[0][:], cv2.COLOR_BGR2GRAY)
+            face = haar.detectMultiScale(img_gray, 1.1)
+            for (x, y, w, h) in face:
+                #cv2.rectangle(bond[0][:], (x, y), (x + h - 10, y + w + 10), (0, 255, 0), 2)
+                cv2.imwrite("test.jpg", bond[0][y:y + w + 10, x:(x + h - 10)])
