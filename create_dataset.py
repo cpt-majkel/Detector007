@@ -5,6 +5,7 @@ import cv2
 from os import listdir
 from os.path import isfile, join
 import random
+import pickle
 
 class CreateDataset:
     """
@@ -47,8 +48,9 @@ class CreateDataset:
                 tmp = cv2.imread(path + "/" + bond)
                 tmp_path = path + "/" + bond
                 ret = self.crop_face(tmp, tmp_path)
+                ret_grayscale = cv2.cvtColor(ret,cv2.COLOR_BGR2GRAY)
                 initials = bond.split("_")[0]
-                self.train_dataset.append((ret, self.initials2name[str(initials)]))
+                self.train_dataset.append((ret_grayscale, self.initials2name[str(initials)]))
             random.shuffle(self.train_dataset)
         except Exception as e:
             print("Following error occured while reading training data: ", e)
@@ -74,4 +76,19 @@ class CreateDataset:
             pass
         else:
             img = cv2.resize(img,(self.train_face_size,self.train_face_size))
-            cv2.imwrite(path,img)
+            cv2.imwrite(path,cv2.cvtColor(img,cv2.COLOR_BGR2GRAY))
+
+    def save_training_to_pickle(self, data, labels): #save training model to pickle
+        pickle_out = open("train_X.pickle", "wb")
+        pickle.dump(data, pickle_out)
+        pickle_out.close()
+        pickle_out = open("train_y.pickle", "wb")
+        pickle.dump(labels, pickle_out)
+        pickle_out.close()
+
+    def load_training_data_pickle(self): #load pickle training model
+        pickle_data = open("train_X.pickle", "rb")
+        X = pickle.load(pickle_data)
+        pickle_labels = open("train_y.pickle", "rb")
+        y = pickle.load(pickle_labels)
+        return X,y  #returns data and labels, in that order
