@@ -4,6 +4,7 @@
 import cv2
 from os import listdir
 from os.path import isfile, join
+import random
 
 class CreateDataset:
     """
@@ -48,6 +49,7 @@ class CreateDataset:
                 ret = self.crop_face(tmp, tmp_path)
                 initials = bond.split("_")[0]
                 self.train_dataset.append((ret, self.initials2name[str(initials)]))
+            random.shuffle(self.train_dataset)
         except Exception as e:
             print("Following error occured while reading training data: ", e)
 
