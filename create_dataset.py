@@ -5,7 +5,6 @@ import cv2
 from os import listdir
 from os.path import isfile, join
 
-
 class CreateDataset:
     """
     Note:
@@ -26,6 +25,7 @@ class CreateDataset:
             "GL": "George Lazenby",
             "TD": "Timothy Dalton"
         }
+        self.train_face_size = 100 #declaring the size of a single training face for uniformity
 
     def read_test_data(self):
         path = self.base_dir + "/test"
@@ -45,9 +45,9 @@ class CreateDataset:
             for bond in files:
                 tmp = cv2.imread(path + "/" + bond)
                 tmp_path = path + "/" + bond
-                self.crop_face(tmp, tmp_path)
+                ret = self.crop_face(tmp, tmp_path)
                 initials = bond.split("_")[0]
-                self.train_dataset.append((tmp, self.initials2name[str(initials)]))
+                self.train_dataset.append((ret, self.initials2name[str(initials)]))
         except Exception as e:
             print("Following error occured while reading training data: ", e)
 
@@ -55,17 +55,21 @@ class CreateDataset:
         self.read_test_data()
         self.read_training_data()
 
-    # def crop_face(self, img):
-    #     haar = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
-    #     for bond in self.train_dataset:
-    #         img_gray = cv2.cvtColor(bond[0][:], cv2.COLOR_BGR2GRAY)
-    #         face = haar.detectMultiScale(img_gray, 1.1)
-    #         for (x, y, w, h) in face:
-    #             cv2.imwrite("test.jpg", bond[0][y:y + w + 10, x:(x + h - 10)])
 
     def crop_face(self, img, path):
         haar = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img1 = []
         face = haar.detectMultiScale(img_gray, 1.2)
         for (x, y, w, h) in face:
-            cv2.imwrite(path, img[y:(y + w + 10), x:(x + h - 10)])
+            #cv2.imwrite(path, img[y:(y + w), x:(x + h)])
+            img1 = img[y:(y + w), x:(x + h)]
+            self.resize_faces(img1, path)
+        return img1
+
+    def resize_faces(self, img, path):
+        if img.shape[0] < self.train_face_size or img.shape[1] < self.train_face_size:
+            pass
+        else:
+            img = cv2.resize(img,(self.train_face_size,self.train_face_size))
+            cv2.imwrite(path,img)
