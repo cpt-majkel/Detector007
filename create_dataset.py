@@ -34,7 +34,7 @@ class CreateDataset:
         try:
             files = [f for f in listdir(path) if isfile(join(path, f))]
             for bond in files:
-                tmp = cv2.imread(path + "/" + bond)
+                tmp = cv2.imread(path + "/" + bond, cv2.IMREAD_GRAYSCALE)
                 initials = bond.split("_")[0]
                 self.test_data.append((tmp, self.initials2name[str(initials)]))
         except Exception as e:
@@ -45,12 +45,12 @@ class CreateDataset:
         try:
             files = [f for f in listdir(path) if isfile(join(path, f))]
             for bond in files:
-                tmp = cv2.imread(path + "/" + bond)
+                tmp = cv2.imread(path + "/" + bond, cv2.IMREAD_GRAYSCALE)
                 tmp_path = path + "/" + bond
-                ret = self.crop_face(tmp, tmp_path)
-                ret_grayscale = cv2.cvtColor(ret,cv2.COLOR_BGR2GRAY)
+                #ret = self.crop_face(tmp, tmp_path)
+                #ret_grayscale = cv2.cvtColor(ret,cv2.COLOR_BGR2GRAY)
                 initials = bond.split("_")[0]
-                self.train_dataset.append((ret_grayscale, self.initials2name[str(initials)]))
+                self.train_dataset.append((tmp, self.initials2name[str(initials)]))
             random.shuffle(self.train_dataset)
         except Exception as e:
             print("Following error occured while reading training data: ", e)
@@ -60,16 +60,23 @@ class CreateDataset:
         self.read_training_data()
 
 
-    def crop_face(self, img, path):
+    def crop_face(self, path):
         haar = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
-        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img1 = []
-        face = haar.detectMultiScale(img_gray, 1.2)
-        for (x, y, w, h) in face:
-            #cv2.imwrite(path, img[y:(y + w), x:(x + h)])
-            img1 = img[y:(y + w), x:(x + h)]
-            self.resize_faces(img1, path)
-        return img1
+        try:
+            files = [f for f in listdir(path) if isfile(join(path, f))]
+            for bond in files:
+                img1 = []
+                print path + "/" + bond
+                tmp = cv2.imread(path + "/" + bond)
+                tmp_path = path + "/" + bond
+                img_gray = cv2.cvtColor(tmp, cv2.COLOR_BGR2GRAY)
+                face = haar.detectMultiScale(img_gray, 1.2)
+                for (x, y, w, h) in face:
+                    # cv2.imwrite(path, img[y:(y + w), x:(x + h)])
+                    img1 = tmp[y:(y + w), x:(x + h)]
+                    self.resize_faces(img1, tmp_path)
+        except Exception as e:
+            print("Following error occured while reading training data: ", e)
 
     def resize_faces(self, img, path):
         if img.shape[0] < self.train_face_size or img.shape[1] < self.train_face_size:
