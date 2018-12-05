@@ -87,8 +87,38 @@ class CreateDataset:
         pickle.dump(self.y, pickle_out)
         pickle_out.close()
 
-    def prepare_training_dataset(self, do_save):
+    def prepare_training_dataset(self, do_save, do_augment):
         self.read_training_data()
+        if do_augment:
+            self.augment_train_data()
         self.create_model()
         if do_save:
             self.save_training_to_pickle()
+
+    @staticmethod
+    def flip_image(im):
+        return np.fliplr(im)
+
+    @staticmethod
+    def translate_image(im, tx, ty):
+        (height, width) = im.shape
+        M = np.float32([[1, 0, tx], [0, 1, ty]])
+        return cv2.warpAffine(im, M, (height, width))
+
+    def augment_train_data(self):  # TODO: AUGMENT IN MORE SOPHISTICATED WAY EG. MORE FOR FEWER BONDS IN GIVEN CLASS
+        train_data_tmp = self.train_dataset.copy()
+        print("Augmenting data set - initial size {0}".format(len(train_data_tmp)))
+
+        for im, label in self.train_dataset:
+            train_data_tmp.append((self.flip_image(im), label))
+            train_data_tmp.append((self.translate_image(im, 5, 0), label))
+            train_data_tmp.append((self.translate_image(im, -5, 0), label))
+            train_data_tmp.append((self.translate_image(im, 0, 5), label))
+            train_data_tmp.append((self.translate_image(im, 0, -5), label))
+            train_data_tmp.append((self.translate_image(im, 5, 5), label))
+            train_data_tmp.append((self.translate_image(im, -5, -5), label))
+
+        random.shuffle(train_data_tmp)
+        self.train_dataset = train_data_tmp
+        print("End of augmenting - final size {0}".format(len(train_data_tmp)))
+

@@ -12,7 +12,7 @@ from sklearn.preprocessing import LabelEncoder
 def main():
     base_image_dir = 'input_data'
     dataset = CreateDataset(base_image_dir, False)
-    dataset.prepare_training_dataset(True)
+    dataset.prepare_training_dataset(True, True)
     X, y = load_training_data_pickle()
     X = X/255.0
     labelencoder_y_1 = LabelEncoder()
@@ -29,8 +29,8 @@ def main():
     model.add(Dense(6))
     model.add(Activation('softmax'))
     model.compile(loss='sparse_categorical_crossentropy',
-              optimizer='adam',
-              metrics=['accuracy'])
+                  optimizer='adam',
+                  metrics=['accuracy'])
     model.fit(X, y_train, batch_size=2, epochs=3, validation_split=0.2)
 
 
