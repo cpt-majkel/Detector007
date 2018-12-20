@@ -14,6 +14,7 @@ def main():
     dataset = CreateDataset(base_image_dir, False)
     dataset.prepare_training_dataset(True, True)
     X, y = load_training_data_pickle()
+
     X = X/255.0
     labelencoder_y_1 = LabelEncoder()
     y_train = labelencoder_y_1.fit_transform(y)
@@ -32,6 +33,8 @@ def main():
                   optimizer='adam',
                   metrics=['accuracy'])
     model.fit(X, y_train, batch_size=2, epochs=3, validation_split=0.2)
+    pickle_out = open("classifier_NN.pickle", "wb")
+    pickle.dump(model, pickle_out)
 
 
 def load_training_data_pickle():  # load pickle training model
