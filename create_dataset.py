@@ -25,12 +25,12 @@ class CreateDataset:
         self.y = []
         self.do_crop = do_crop
         self.initials2name = {
-            "SC": "Sean Connery",
-            "PB": "Pierce Brosnan",
-            "DC": "Daniel Craig",
-            "RM": "Roger Moore",
-            "GL": "George Lazenby",
-            "TD": "Timothy Dalton"
+            "SC": 0,
+            "PB": 1,
+            "DC": 2,
+            "RM": 3,
+            "GL": 4,
+            "TD": 5
         }
         self.train_face_size = 100  # declaring the size of a single training face for uniformity
 
