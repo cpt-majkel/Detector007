@@ -37,14 +37,18 @@ def main():
     print(len(X), val_ind)
 
     model = Sequential()
-    model.add(Conv2D(64, (3, 3), input_shape=(100, 100, 1)))
+    model.add(Conv2D(32, (3, 3), input_shape=(100, 100, 1)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Conv2D(64, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Conv2D(128, (3, 3)))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
     # model.add(Dense(64))
+    model.add(Dense(32))
     model.add(Dense(6))
     model.add(Activation('softmax'))
     model.compile(loss='sparse_categorical_crossentropy',
