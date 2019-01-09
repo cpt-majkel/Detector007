@@ -74,16 +74,18 @@ class CreateDataset:
             img_gray = img_gray[y:(y + w), x:(x + h)]
 
     def create_model(self):
+        self.X = []
+        self.y = []
         for features, label in self.train_dataset:
             self.X.append(features)
             self.y.append(label)
         self.X = np.array(self.X).reshape(-1, self.train_face_size, self.train_face_size, 1)
 
-    def save_training_to_pickle(self):  # save training model to pickle
-        pickle_out = open("train_X.pickle", "wb")
+    def save_training_to_pickle(self, pickle_name):  # save training model to pickle
+        pickle_out = open(pickle_name + "_X.pickle", "wb")
         pickle.dump(self.X, pickle_out)
         pickle_out.close()
-        pickle_out = open("train_y.pickle", "wb")
+        pickle_out = open(pickle_name + "_y.pickle", "wb")
         pickle.dump(self.y, pickle_out)
         pickle_out.close()
 
@@ -93,7 +95,7 @@ class CreateDataset:
             self.augment_train_data()
         self.create_model()
         if do_save:
-            self.save_training_to_pickle()
+            self.save_training_to_pickle('train')
 
     @staticmethod
     def flip_image(im):
@@ -107,18 +109,21 @@ class CreateDataset:
 
     def augment_train_data(self):  # TODO: AUGMENT IN MORE SOPHISTICATED WAY EG. MORE FOR FEWER BONDS IN GIVEN CLASS
         train_data_tmp = self.train_dataset.copy()
+        self.create_model()
+        self.save_training_to_pickle('before_augment')
         print("Augmenting data set - initial size {0}".format(len(train_data_tmp)))
 
         for im, label in self.train_dataset:
             train_data_tmp.append((self.flip_image(im), label))
-            train_data_tmp.append((self.translate_image(im, 5, 0), label))
-            train_data_tmp.append((self.translate_image(im, -5, 0), label))
-            train_data_tmp.append((self.translate_image(im, 0, 5), label))
-            train_data_tmp.append((self.translate_image(im, 0, -5), label))
-            train_data_tmp.append((self.translate_image(im, 5, 5), label))
-            train_data_tmp.append((self.translate_image(im, -5, -5), label))
+            train_data_tmp.append((self.translate_image(im, 3, 0), label))
+            train_data_tmp.append((self.translate_image(im, -3, 0), label))
+            train_data_tmp.append((self.translate_image(im, 0, 3), label))
+            train_data_tmp.append((self.translate_image(im, 0, -3), label))
+            train_data_tmp.append((self.translate_image(im, 3, 3), label))
+            train_data_tmp.append((self.translate_image(im, -3, -3), label))
 
         random.shuffle(train_data_tmp)
+
         self.train_dataset = train_data_tmp
         print("End of augmenting - final size {0}".format(len(train_data_tmp)))
 
